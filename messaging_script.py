@@ -58,12 +58,19 @@ while True:
     availability = cs.find_availability_by_year(args.park, args.campground, args.year, args.months)
 
     if availability:
-        msg = "Availability found at " + args.park + args.campground + ":\n"
+        msg = "Availability found at " + args.park + " " + args.campground + ":\n"
         for available in availability:
             msg += available.strftime("%Y-%m-%d") + "\n"
-        msg_alert("Campsite Availability", msg)
+            # split up texts before they go over newline limit
+            if len(msg) > 125:
+                msg_alert("Campsite Availability", msg)
+                if args.verbose:
+                    print(msg)
+                msg = ""
+        if len(msg) > 0:
+            msg_alert("Campsite Availability", msg)
     else:
-        msg = ("No available sites found for " + args.park + args.campground +
+        msg = ("No available sites found for " + args.park + " " + args.campground +
                ". Will try to search again in " + str(args.sleep / 3600) + " hours.")
         msg_alert("Campsite Availability", msg)
 
