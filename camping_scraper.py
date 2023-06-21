@@ -17,7 +17,7 @@ def createHeadlessChromeBrowser():
     return webdriver.Chrome(options=options)
 
 
-def find_availability_by_month(park, campground, year, month):
+def find_availability_by_month(park, campground, year, month, weekend_only=True):
     """
     Parameters
     ----------
@@ -28,6 +28,9 @@ def find_availability_by_month(park, campground, year, month):
     year : str
 
     month : str
+
+    weekend_only : bool
+        whether to search only for weekend vs. any day availability
 
     Returns
     -------
@@ -62,13 +65,13 @@ def find_availability_by_month(park, campground, year, month):
             day = day.get_text()
             date = datetime.strptime(year + "-" + month + "-" + day, "%Y-%m-%d")
             # Check if the date is a Friday or Saturday
-            if date.weekday() == 4 or date.weekday() == 5:
+            if not weekend_only or date.weekday() == 4 or date.weekday() == 5:
                 available.append(date)
 
     return available
 
 
-def find_availability_by_year(park, campground, year, months=range(1, 13)):
+def find_availability_by_year(park, campground, year, months=range(1, 13), weekend_only=True):
     """
     Parameters
     ----------
@@ -81,6 +84,9 @@ def find_availability_by_year(park, campground, year, months=range(1, 13)):
     months : list
         list of months as str or int. Default is `range(1, 13)`
 
+    weekend_only : bool
+        whether to search only for weekend vs. any day availability
+
     Returns
     -------
     list
@@ -92,7 +98,13 @@ def find_availability_by_year(park, campground, year, months=range(1, 13)):
         if isinstance(month, int):
             month = str(month)
         try:
-            monthly_availability = find_availability_by_month(park, campground, year, month)
+            monthly_availability = find_availability_by_month(
+                park,
+                campground,
+                year,
+                month,
+                weekend_only=weekend_only
+            )
             yearly_availability.append(monthly_availability)
         except:
             break
